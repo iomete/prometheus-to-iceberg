@@ -46,6 +46,8 @@ def main():
                 end=end.timestamp(),
                 step=config.step,
                 timeout=config.prometheus.timeout_seconds,
+                headers=config.prometheus.headers or None,
+                tls_verify=config.prometheus.tls_verify,
             )
 
             if not results:
