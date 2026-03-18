@@ -3,7 +3,7 @@ prometheus:
   timeout_seconds: 30
 
 spark:
-  remote: sc://dev.iomete.cloud:443/;cluster=spark-compute;data_plane=spark-resources;use_ssl=true;user_id=fuad;api_token=mE-GJDv01xu-28ccb4AW9vZaYkqS9Gck7Q1SWb0sd6Q
+  remote: null
 
 defaults:
   database: "spark_catalog.prom_metrics_db"
