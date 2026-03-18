@@ -10,6 +10,8 @@ import yaml
 class PrometheusConfig:
     url: str
     timeout_seconds: int = 30
+    headers: dict[str, str] = field(default_factory=dict)
+    tls_verify: bool = True
 
 
 @dataclass
@@ -46,6 +48,8 @@ def load_config(path: str) -> AppConfig:
     prom = PrometheusConfig(
         url=raw["prometheus"]["url"].rstrip("/"),
         timeout_seconds=raw["prometheus"].get("timeout_seconds", 30),
+        headers=raw["prometheus"].get("headers", {}),
+        tls_verify=raw["prometheus"].get("tls_verify", True),
     )
 
     spark_raw = raw.get("spark", {})

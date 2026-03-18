@@ -16,6 +16,8 @@ def query_range(
     end: float,
     step: str,
     timeout: int = 30,
+    headers: dict[str, str] | None = None,
+    tls_verify: bool = True,
 ) -> list[dict]:
     url = f"{base_url}/api/v1/query_range"
     params = {
@@ -28,7 +30,7 @@ def query_range(
     last_exc = None
     for attempt in range(MAX_RETRIES):
         try:
-            resp = requests.get(url, params=params, timeout=timeout)
+            resp = requests.get(url, params=params, timeout=timeout, headers=headers, verify=tls_verify)
             resp.raise_for_status()
             body = resp.json()
 

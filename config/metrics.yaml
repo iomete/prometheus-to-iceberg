@@ -1,6 +1,9 @@
 prometheus:
   url: "http://localhost:9090"
   timeout_seconds: 30
+  headers:
+    X-Scope-OrgID: "your-tenant-id"
+  tls_verify: false
 
 spark:
   remote: null
