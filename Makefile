@@ -3,7 +3,7 @@ CONFIG ?= config/metrics.yaml
 .PHONY: package clean run
 
 package: clean
-	cd prometheus_to_iceberg && zip -r ../prometheus_to_iceberg.zip . -x '__pycache__/*' '*.pyc'
+	zip -r prometheus_to_iceberg.zip prometheus_to_iceberg/ -x '*__pycache__/*' '*.pyc'
 
 clean:
 	rm -f prometheus_to_iceberg.zip
