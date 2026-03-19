@@ -5,6 +5,7 @@ from pyspark.sql import SparkSession
 
 from prometheus_to_iceberg.config import load_config, parse_args, get_time_window
 from prometheus_to_iceberg.prometheus import query_range
+from prometheus_to_iceberg.templating import substitute
 from prometheus_to_iceberg.transformer import to_dataframe
 from prometheus_to_iceberg.writer import ensure_table, write
 
@@ -39,9 +40,12 @@ def main():
         logger.info("Processing metric: %s -> %s.%s", metric.name, config.database, table_name)
 
         try:
+            resolved_query = substitute(metric.query, config.variables)
+            logger.info("Resolved query: %s", resolved_query)
+
             results = query_range(
                 base_url=config.prometheus.url,
-                query=metric.query,
+                query=resolved_query,
                 start=start.timestamp(),
                 end=end.timestamp(),
                 step=config.step,

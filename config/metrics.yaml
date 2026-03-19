@@ -12,10 +12,19 @@ defaults:
   database: "spark_catalog.prom_metrics_db"
   step: "60s"
 
+# Variables for query templating. Use $varname in queries.
+# Scalar values are substituted as-is.
+# List values are joined with '|' for PromQL regex matching (use with =~).
+variables:
+  cluster: "us-east-1"
+  namespace:
+    - "kube-system"
+    - "monitoring"
+
 metrics:
   - name: "node_cpu_seconds_total"
-    query: 'rate(node_cpu_seconds_total{mode="idle"}[5m])'
+    query: 'rate(node_cpu_seconds_total{cluster="$cluster", namespace=~"$namespace", mode="idle"}[5m])'
     table: "node_cpu_idle_rate"
   - name: "http_requests_total"
-    query: 'sum(rate(http_requests_total[5m])) by (service, method, code)'
+    query: 'sum(rate(http_requests_total{cluster="$cluster", namespace=~"$namespace"}[5m])) by (service, method, code)'
     table: "http_request_rate"
