@@ -5,6 +5,8 @@ from typing import Optional
 
 import yaml
 
+from prometheus_to_iceberg.templating import resolve_variables
+
 
 @dataclass
 class PrometheusConfig:
@@ -39,6 +41,7 @@ class AppConfig:
     database: str
     step: str
     metrics: list[MetricConfig] = field(default_factory=list)
+    variables: dict[str, str] = field(default_factory=dict)
 
 
 def load_config(path: str) -> AppConfig:
@@ -71,7 +74,9 @@ def load_config(path: str) -> AppConfig:
             )
         )
 
-    return AppConfig(prometheus=prom, spark=spark_config, database=database, step=step, metrics=metrics)
+    variables = resolve_variables(raw.get("variables"))
+
+    return AppConfig(prometheus=prom, spark=spark_config, database=database, step=step, metrics=metrics, variables=variables)
 
 
 def parse_args(args=None) -> argparse.Namespace:
