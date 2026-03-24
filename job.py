@@ -1,5 +1,4 @@
 import logging
-import sys
 
 from pyspark.sql import SparkSession
 
@@ -33,47 +32,42 @@ def main():
         builder = builder.remote(spark_remote)
     spark = builder.getOrCreate()
 
-    failures = []
-
+    # Phase 1: fetch and transform all metrics before writing anything.
+    # If any metric fails here, we abort without writing any data.
+    pending = []
     for metric in config.metrics:
         table_name = metric.table_name
         logger.info("Processing metric: %s -> %s.%s", metric.name, config.database, table_name)
 
-        try:
-            resolved_query = substitute(metric.query, config.variables)
-            logger.info("Resolved query: %s", resolved_query)
+        resolved_query = substitute(metric.query, config.variables)
+        logger.info("Resolved query: %s", resolved_query)
 
-            results = query_range(
-                base_url=config.prometheus.url,
-                query=resolved_query,
-                start=start.timestamp(),
-                end=end.timestamp(),
-                step=config.step,
-                timeout=config.prometheus.timeout_seconds,
-                headers=config.prometheus.headers or None,
-                tls_verify=config.prometheus.tls_verify,
-            )
+        results = query_range(
+            base_url=config.prometheus.url,
+            query=resolved_query,
+            start=start.timestamp(),
+            end=end.timestamp(),
+            step=config.step,
+            timeout=config.prometheus.timeout_seconds,
+            headers=config.prometheus.headers or None,
+            tls_verify=config.prometheus.tls_verify,
+        )
 
-            if not results:
-                logger.warning("No data returned for metric %s, skipping write", metric.name)
-                continue
+        if not results:
+            logger.warning("No data returned for metric %s, skipping write", metric.name)
+            continue
 
-            df = to_dataframe(spark, results, metric.name)
-            ensure_table(spark, config.database, table_name)
-            write(df, config.database, table_name)
+        df = to_dataframe(spark, results, metric.name)
+        logger.info("DataFrame preview:\n%s", df.show(5))
+        pending.append((metric, table_name, df))
 
-            logger.info("Successfully wrote metric %s", metric.name)
-
-        except Exception:
-            logger.exception("Failed to process metric %s", metric.name)
-            failures.append(metric.name)
+    # Phase 2: all fetches succeeded — now write everything.
+    for metric, table_name, df in pending:
+        ensure_table(spark, config.database, table_name)
+        write(df, config.database, table_name)
+        logger.info("Successfully wrote metric %s", metric.name)
 
     spark.stop()
-
-    if failures:
-        logger.error("Failed metrics: %s", ", ".join(failures))
-        sys.exit(1)
-
     logger.info("All metrics processed successfully")
 
 

@@ -22,4 +22,9 @@ def ensure_table(spark: SparkSession, database: str, table_name: str) -> None:
 def write(df: DataFrame, database: str, table_name: str) -> None:
     full_table = f"{database}.{table_name}"
     df.writeTo(full_table).overwritePartitions()
+    # print --- via logger
+    logger.info("----------------------------------------------------------")
+    logger.info(" ")
     logger.info("Wrote %d rows to %s", df.count(), full_table)
+    logger.info(" ")
+    logger.info("----------------------------------------------------------")
