@@ -58,3 +58,12 @@ def test_explicit_window_strips_whitespace():
 
     assert start == datetime(2026, 3, 25, 12, 0, 0, tzinfo=timezone.utc)
     assert end == datetime(2026, 3, 25, 18, 0, 0, tzinfo=timezone.utc)
+
+
+def test_parse_args_strips_whitespace_from_flags():
+    from prometheus_to_iceberg.config import parse_args
+    args = parse_args(["--config ", " metrics.yaml", "--start ", " 2026-03-25T12:00:00Z", "--end ", " 2026-03-25T18:00:00Z"])
+
+    assert args.config == "metrics.yaml"
+    assert args.start == "2026-03-25T12:00:00Z"
+    assert args.end == "2026-03-25T18:00:00Z"

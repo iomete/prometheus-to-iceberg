@@ -80,6 +80,10 @@ def load_config(path: str) -> AppConfig:
 
 
 def parse_args(args=None) -> argparse.Namespace:
+    import sys
+    if args is None:
+        args = sys.argv[1:]
+    args = [a.strip() for a in args]
     parser = argparse.ArgumentParser(description="Prometheus to Iceberg scraper")
     parser.add_argument("--config", required=True, help="Path to metrics YAML config")
     parser.add_argument("--start", default=None, help="Start time (ISO 8601)")
