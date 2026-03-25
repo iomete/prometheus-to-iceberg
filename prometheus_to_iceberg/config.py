@@ -80,6 +80,10 @@ def load_config(path: str) -> AppConfig:
 
 
 def parse_args(args=None) -> argparse.Namespace:
+    import sys
+    if args is None:
+        args = sys.argv[1:]
+    args = [a.strip() for a in args]
     parser = argparse.ArgumentParser(description="Prometheus to Iceberg scraper")
     parser.add_argument("--config", required=True, help="Path to metrics YAML config")
     parser.add_argument("--start", default=None, help="Start time (ISO 8601)")
@@ -90,8 +94,8 @@ def parse_args(args=None) -> argparse.Namespace:
 
 def get_time_window(args: argparse.Namespace) -> tuple[datetime, datetime]:
     if args.start and args.end:
-        start = datetime.fromisoformat(args.start.replace("Z", "+00:00"))
-        end = datetime.fromisoformat(args.end.replace("Z", "+00:00"))
+        start = datetime.fromisoformat(args.start.strip().replace("Z", "+00:00"))
+        end = datetime.fromisoformat(args.end.strip().replace("Z", "+00:00"))
         return start, end
 
     now = datetime.now(timezone.utc)
