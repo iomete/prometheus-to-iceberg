@@ -31,6 +31,7 @@ def main():
     if spark_remote:
         builder = builder.remote(spark_remote)
     spark = builder.getOrCreate()
+    spark.conf.set("spark.sql.session.timeZone", "UTC")
 
     # Phase 1: fetch and transform all metrics before writing anything.
     # If any metric fails here, we abort without writing any data.
