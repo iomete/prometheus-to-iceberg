@@ -90,8 +90,8 @@ def parse_args(args=None) -> argparse.Namespace:
 
 def get_time_window(args: argparse.Namespace) -> tuple[datetime, datetime]:
     if args.start and args.end:
-        start = datetime.fromisoformat(args.start.replace("Z", "+00:00"))
-        end = datetime.fromisoformat(args.end.replace("Z", "+00:00"))
+        start = datetime.fromisoformat(args.start.strip().replace("Z", "+00:00"))
+        end = datetime.fromisoformat(args.end.strip().replace("Z", "+00:00"))
         return start, end
 
     now = datetime.now(timezone.utc)

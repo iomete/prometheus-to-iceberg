@@ -2,6 +2,8 @@ import logging
 
 from pyspark.sql import SparkSession
 
+from datetime import timedelta
+
 from prometheus_to_iceberg.config import load_config, parse_args, get_time_window
 from prometheus_to_iceberg.prometheus import query_range
 from prometheus_to_iceberg.templating import substitute
@@ -47,7 +49,7 @@ def main():
             base_url=config.prometheus.url,
             query=resolved_query,
             start=start.timestamp(),
-            end=end.timestamp(),
+            end=(end - timedelta(seconds=1)).timestamp(),
             step=config.step,
             timeout=config.prometheus.timeout_seconds,
             headers=config.prometheus.headers or None,
