@@ -14,8 +14,9 @@ def ensure_table(spark: SparkSession, database: str, table_name: str) -> None:
             labels      MAP<STRING, STRING>,
             value       DOUBLE,
             dt          STRING,
-            hour        INT
-        ) USING iceberg PARTITIONED BY (dt, hour)
+            cluster     STRING,
+            namespace   STRING
+        ) USING iceberg PARTITIONED BY (cluster, namespace, dt)
     """)
 
 

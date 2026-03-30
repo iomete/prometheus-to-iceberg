@@ -8,7 +8,6 @@ from pyspark.sql.types import (
     StringType,
     MapType,
     DoubleType,
-    IntegerType,
 )
 
 SCHEMA = StructType([
@@ -17,7 +16,8 @@ SCHEMA = StructType([
     StructField("labels", MapType(StringType(), StringType()), False),
     StructField("value", DoubleType(), False),
     StructField("dt", StringType(), False),
-    StructField("hour", IntegerType(), False),
+    StructField("cluster", StringType(), False),
+    StructField("namespace", StringType(), False),
 ])
 
 
@@ -40,7 +40,8 @@ def to_dataframe(
                 labels,
                 float(val_str),
                 dt_obj.strftime("%Y-%m-%d"),
-                dt_obj.hour,
+                labels.get("cluster", "unknown"),
+                labels.get("namespace", "unknown"),
             ))
 
     return spark.createDataFrame(rows, schema=SCHEMA)
