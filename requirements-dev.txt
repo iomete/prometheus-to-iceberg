@@ -8,4 +8,4 @@ grpcio==1.67.1
 googleapis-common-protos==1.72.0
 grpcio-status==1.67.1
 
-setuptools==75.3.0
+setuptools==78.1.1
