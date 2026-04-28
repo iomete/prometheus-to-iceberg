@@ -22,10 +22,21 @@ def ensure_table(spark: SparkSession, database: str, table_name: str) -> None:
 
 def write(df: DataFrame, database: str, table_name: str) -> None:
     full_table = f"{database}.{table_name}"
-    df.writeTo(full_table).overwritePartitions()
-    # print --- via logger
+    count = df.count()
+    df.createOrReplaceTempView("_incoming")
+    df.sparkSession.sql(f"""
+        MERGE INTO {full_table} t
+        USING _incoming s
+        ON  t.dt          = s.dt
+        AND t.cluster     = s.cluster
+        AND t.namespace   = s.namespace
+        AND t.timestamp   = s.timestamp
+        AND t.metric_name = s.metric_name
+        WHEN MATCHED THEN UPDATE SET *
+        WHEN NOT MATCHED THEN INSERT *
+    """)
     logger.info("----------------------------------------------------------")
     logger.info(" ")
-    logger.info("Wrote %d rows to %s", df.count(), full_table)
+    logger.info("Wrote %d rows to %s", count, full_table)
     logger.info(" ")
     logger.info("----------------------------------------------------------")
