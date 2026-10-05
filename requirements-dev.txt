@@ -1,6 +1,6 @@
 requests>=2.31,<3
 PyYAML>=6.0,<7
-pyspark==3.5.7
+pyspark==3.5.9
 pandas==2.2.3
 pyarrow==23.0.1
 
